@@ -77,8 +77,12 @@ mc.window.auto <- function(xl, u, k, K, sorted=FALSE, metric=norm){
     xl <- xl[orderedIndexes,]
     distances <- distances[orderedIndexes]
   }
-  xl <- xl[,cols]
-  wp <- distances[1:k]/distances[k+1]
+  xl <- xl[1:k,cols]
+  h<-distances[k+1]
+  if(h==0)
+      h<-0.01
+
+  wp <- distances[1:k]/h
   
   classes <- c(names(table(xl)), "none")
   score <- rep(0, length(classes))
@@ -92,6 +96,34 @@ mc.window.auto <- function(xl, u, k, K, sorted=FALSE, metric=norm){
   }
   
   classes[which.max(score)]
+}
+
+mc.stolp(xl, l0, delta1, delta0, f, ot, ...){
+  cols <- ncol(xl)
+  rows <- nrow(xl)
+  
+  for(u in xl){
+    o <- ot(xl, u, ...)
+    xla <- rbind(xla, xl[o>delta1,])
+  }
+  
+  l <- 1
+  while(l>=l0){
+    err<-0
+    xlaa <- c()
+    for(u in xl){
+      class <- f(xla, u, ...)
+      if(class != u[cols]){
+        if(ot(xla, u, ...)<delta0){
+          xlaa <- rbind(xlaa, u)
+        }
+        err <-- err+1
+      }
+    }
+    xla <- unique(rbind(xla, xlaa))
+    l <- err/cols
+  }
+  
 }
 
 setka <- function(f, xl, color, mi, ma, acc, ...){
@@ -209,7 +241,7 @@ k <- 6
 setka(mc.kwnn, sel, colors, mi, ma, 0.1, k, mc.wlin)
 legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3)))
 
-#LOO in kwnn
+#LOO in parzen
 hs<-seq(from=0.1, to=2, by=0.1)
 p<-loo.list(mc.window, sel, hs, mc.K.T)
 plot(p, type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW", ylim=c(0, 0.2))
@@ -219,6 +251,7 @@ lines(loo.list(mc.window, sel, hs, mc.K.G),  col = "blue")
 lines(loo.list(mc.window, sel, hs, mc.K.Q),  col = "grey")
 legend(1.8, 0.2, legend=c("K=T", "K=P", "K=E", "K=G", "K=Q"), lty=5, col=c("black", "red", "green", "blue", "grey") )
 
+#LOO in parzen auto
 hs<-1:20
 p<-loo.list(mc.window.auto, sel, hs, mc.K.T)
 plot(p, type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW", ylim=c(0, 0.2))
@@ -234,7 +267,7 @@ k <- 6
 setka(mc.kwnn, sel, colors, mi, ma, 0.1, k, mc.wlin)
 legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3)))
 
-
+##
 plot(pl, col=colors[sel$Species], pch=19)
 k <- 6
 w <- apply(data.frame(k, 1:k), 1, mc.w )
@@ -242,3 +275,18 @@ loo(mc.knn, sel, k)
 setka(mc.window.auto, sel, colors, c(1,0.1), c(7,2.5), 0.1, k, mc.K.T)
 setka(mc.kwnn, sel, colors, c(1,0.1), c(7,2.5), 0.1, k, mc.w)
 
+
+xl<-sel
+cols <- ncol(xl)
+rows <- nrow(xl)
+u<-c(1.4, 0.2)
+umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
+vmat<-xl[,1:(cols-1)]
+distances <- norm(umat - xl[,1:(cols-1)])
+
+  orderedIndexes <- order(distances)
+  xl <- xl[orderedIndexes,]
+  distances <- distances[orderedIndexes]
+
+xl <- xl[,cols]
+wp <- distances[1:k]/distances[k+1]
