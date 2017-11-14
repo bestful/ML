@@ -1,3 +1,4 @@
+ML_METRIC <- T
 
 mc.knn <- function(xl, u, k, sorted=FALSE, metric=norm){
   cols <- ncol(xl)
@@ -79,6 +80,36 @@ mc.parzen.auto <- function(xl, u, k, K, sorted=FALSE, metric=norm){
     h<-0.01
   
   wp <- distances[1:k]/h
+  
+  classes <- c(names(table(xl)), "none")
+  score <- rep(0, length(classes))
+  score[length(classes)]<-0.00001
+  i <- 1
+  
+  for(el in xl){
+    class <- xl[i]
+    score[class] <- score[class]+K(wp[i])
+    i <- i+1
+  }
+  
+  classes[which.max(score)]
+}
+
+mc.poten <- function(xl, u, g, h, K, sorted=FALSE, metric=norm){
+
+  cols <- ncol(xl)
+  rows <- nrow(xl)
+
+  umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
+  print(umat)
+  distances <- metric(umat - xl[,1:(cols-1)])
+  if(sorted != TRUE){
+    orderedIndexes <- order(distances)
+    xl <- xl[orderedIndexes,]
+    distances <- distances[orderedIndexes]
+  }
+  xl <- xl[,cols]
+  wp <- (g*distances)/h
   
   classes <- c(names(table(xl)), "none")
   score <- rep(0, length(classes))

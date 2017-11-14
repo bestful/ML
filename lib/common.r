@@ -1,3 +1,5 @@
+ML_COMMON <- T
+
 norm <- function(x){
   r <- apply(x^2, 1, sum)
   sqrt(r)

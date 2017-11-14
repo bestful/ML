@@ -1,10 +1,12 @@
 source("../lib/common.r")
 source("../lib/metric.r")
 source("../lib/kernel.r")
+source("../lib/learn.r")
 
 p <- loo.list(mc.parzen, sel, seq(from=0.1, to=5, by=0.1), ker.T)
 plot(p, type="l", xlab="k in knn", ylab="errors using loo")
 
+gamma <- learn.gamma(mc.poten, sel, 1, 0.53, ker.T)
 
 #init
 sel<-iris[,3:5]
@@ -74,7 +76,7 @@ plot(pl, col=colors[sel$Species], pch=19)
 k <- 6
 w <- apply(data.frame(k, 1:k), 1, mc.w )
 loo(mc.knn, sel, k)
-lattice(mc.parzen.auto, sel, colors, c(1,0.1), c(7,2.5), 0.1, k, ker.T)
+lattice(mc.poten, sel, colors, c(1,0.1), c(7,2.5), 0.1, 0.2, 0.2, ker.T)
 lattice(mc.kwnn, sel, colors, c(1,0.1), c(7,2.5), 0.1, k, mc.w)
 
 

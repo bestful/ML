@@ -1,4 +1,4 @@
-
+ML_ALPHA <- T
 
 mc.stolp(xl, l0, delta1, delta0, f, ot, ...){
   cols <- ncol(xl)
