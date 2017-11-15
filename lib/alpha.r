@@ -27,3 +27,12 @@ mc.stolp(xl, l0, delta1, delta0, f, ot, ...){
   }
   
 }
+
+learn.gamma.gen <- function(f, xl, by, ...){
+  g <- learn.gamma(f, xl, by, ...)
+  gen <- f
+  formals(gen) <- formals(f)[-3]
+  en <- environment(gen)
+  en$g = g
+  gen
+}

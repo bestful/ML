@@ -5,8 +5,14 @@ source("../lib/learn.r")
 
 p <- loo.list(mc.parzen, sel, seq(from=0.1, to=5, by=0.1), ker.T)
 plot(p, type="l", xlab="k in knn", ylab="errors using loo")
+plot(pl, col=colors[sel$Species], main="1NN", pch=19)
 
-gamma <- learn.gamma(mc.poten, sel, 1, 0.53, ker.T)
+for(h in seq(0.1, 1, 0.1)){
+  l<-loo(learn.gamma.gen(mc.poten, xl, h, ker.T), xl)
+  kk <- rbind(kk, c(h, l))
+}
+lattice(learn.gamma.gen(mc.poten, xl, 0.2, ker.T), sel, colors, mi, ma, 0.1, 0.2, ker.T)
+learn.loo(learn.gamma.gen(mc.poten, xl), xl, seq(0.1, 1, 0.1), ker.T)
 
 #init
 sel<-iris[,3:5]
@@ -27,6 +33,9 @@ legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, 1), digits=3))
 p<-loo.list(mc.knn, sel, 1:50)
 plot(p, type="l", xlab="k", ylab="error", main="LOO KNN")
 legend(0, 0.066, legend=paste("LOO(6) =", round(loo(mc.knn, sel, 6), digits=3)))
+
+el<-learn.loo(mc.pten, sel, 1:20)
+loo(mc.knn, xl, el)
 
 #6NN lattice with LOO
 plot(pl, col=colors[sel$Species], main="6NN", pch=19)

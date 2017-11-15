@@ -1,8 +1,12 @@
 ML_METRIC <- T
 
-mc.knn <- function(xl, u, k, sorted=FALSE, metric=norm){
+if(ML_COMMON == F)
+  source("common.r")
+
+mc.knn <- function(xl, u, k, metric=norm, sorted=FALSE){
   cols <- ncol(xl)
   rows <- nrow(xl)
+  u <- unname(unlist(u))
   if(sorted != TRUE){
     umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
     xl <- xl[order(metric(umat - xl[,1:(cols-1)] )),]
@@ -10,9 +14,10 @@ mc.knn <- function(xl, u, k, sorted=FALSE, metric=norm){
   xl[which.max(table(xl[1:k,cols])), cols]
 }
 
-mc.kwnn <- function(xl, u, k, wf, sorted=FALSE, metric=norm){
+mc.kwnn <- function(xl, u, k, wf, metric=norm, sorted=FALSE){
   cols <- ncol(xl)
   rows <- nrow(xl)
+  u <- unname(unlist(u))
   
   if(sorted != TRUE){
     umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
@@ -35,17 +40,13 @@ mc.kwnn <- function(xl, u, k, wf, sorted=FALSE, metric=norm){
   classes[which.max(score)]
 }
 
-mc.parzen <- function(xl, u, h, K, sorted=FALSE, metric=norm){
+mc.parzen <- function(xl, u, h, K, metric=norm){
   cols <- ncol(xl)
   rows <- nrow(xl)
+  u <- unname(unlist(u))
   
   umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
   distances <- metric(umat - xl[,1:(cols-1)])
-  if(sorted != TRUE){
-    orderedIndexes <- order(distances)
-    xl <- xl[orderedIndexes,]
-    distances <- distances[orderedIndexes]
-  }
   xl <- xl[,cols]
   wp <- distances/h
   
@@ -63,9 +64,10 @@ mc.parzen <- function(xl, u, h, K, sorted=FALSE, metric=norm){
   classes[which.max(score)]
 }
 
-mc.parzen.auto <- function(xl, u, k, K, sorted=FALSE, metric=norm){
+mc.parzen.auto <- function(xl, u, k, K, metric=norm, sorted=FALSE){
   cols <- ncol(xl)
   rows <- nrow(xl)
+  u <- unname(unlist(u))
   
   umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
   distances <- metric(umat - xl[,1:(cols-1)])
@@ -95,21 +97,15 @@ mc.parzen.auto <- function(xl, u, k, K, sorted=FALSE, metric=norm){
   classes[which.max(score)]
 }
 
-mc.poten <- function(xl, u, g, h, K, sorted=FALSE, metric=norm){
-
+mc.poten <- function(xl, u, g, h, K, metric=norm){
   cols <- ncol(xl)
   rows <- nrow(xl)
-
+  u <- unname(unlist(u))
+  
   umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
-  print(umat)
   distances <- metric(umat - xl[,1:(cols-1)])
-  if(sorted != TRUE){
-    orderedIndexes <- order(distances)
-    xl <- xl[orderedIndexes,]
-    distances <- distances[orderedIndexes]
-  }
   xl <- xl[,cols]
-  wp <- (g*distances)/h
+  wp <- distances/h
   
   classes <- c(names(table(xl)), "none")
   score <- rep(0, length(classes))
@@ -118,9 +114,10 @@ mc.poten <- function(xl, u, g, h, K, sorted=FALSE, metric=norm){
   
   for(el in xl){
     class <- xl[i]
-    score[class] <- score[class]+K(wp[i])
+    score[class] <- score[class]+g[i]*K(wp[i])
     i <- i+1
   }
   
   classes[which.max(score)]
 }
+
