@@ -7,12 +7,18 @@ p <- loo.list(mc.parzen, sel, seq(from=0.1, to=5, by=0.1), ker.T)
 plot(p, type="l", xlab="k in knn", ylab="errors using loo")
 plot(pl, col=colors[sel$Species], main="1NN", pch=19)
 
-for(h in seq(0.1, 1, 0.1)){
-  l<-loo(learn.gamma.gen(mc.poten, xl, h, ker.T), xl)
+kk <- c()
+for(h in seq(0.1, 1, 0.03)){
+  l<-loo(learn.gamma.gen(mc.poten, xl, h, ker.T), xl, ker.T)
+  l
   kk <- rbind(kk, c(h, l))
 }
-lattice(learn.gamma.gen(mc.poten, xl, 0.2, ker.T), sel, colors, mi, ma, 0.1, 0.2, ker.T)
-learn.loo(learn.gamma.gen(mc.poten, xl), xl, seq(0.1, 1, 0.1), ker.T)
+
+lattice(learn.gamma.gen(mc.poten, sel, 0.3, ker.T), sel, colors, mi, ma, 0.1, 0.3, ker.T)
+learn.loo(function(xl, u, h, K){
+  g <- learn.gamma(mc.poten, xl, h, ker.T)
+  mc.poten(xl, u, g, h, K)
+}, xl, seq(0.1, 0.2, 0.1), ker.T)
 
 #init
 sel<-iris[,3:5]

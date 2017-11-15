@@ -121,3 +121,7 @@ mc.poten <- function(xl, u, g, h, K, metric=norm){
   classes[which.max(score)]
 }
 
+mc.stolp <- function(f, xl, u, ...){
+  
+  
+}
