@@ -18,7 +18,7 @@ learn.gamma <- function(f, xl, ...){
 
 learn.gamma.gen <- function(f, xl,  ...){
   g <- learn.gamma(f, xl,  ...)
-  gen <- f
+  gen <- fplo
   formals(gen) <- formals(f)[-3]
   en <- environment(gen)
   en$g = g

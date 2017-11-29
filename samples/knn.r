@@ -3,23 +3,6 @@ source("../lib/metric.r")
 source("../lib/kernel.r")
 source("../lib/learn.r")
 
-p <- loo.list(mc.parzen, sel, seq(from=0.1, to=5, by=0.1), ker.T)
-plot(p, type="l", xlab="k in knn", ylab="errors using loo")
-plot(pl, col=colors[sel$Species], main="1NN", pch=19)
-
-kk <- c()
-for(h in seq(0.1, 1, 0.03)){
-  l<-loo(learn.gamma.gen(mc.poten, xl, h, ker.T), xl, ker.T)
-  l
-  kk <- rbind(kk, c(h, l))
-}
-
-lattice(learn.gamma.gen(mc.poten, sel, 0.3, ker.T), sel, colors, mi, ma, 0.1, 0.3, ker.T)
-learn.loo(function(xl, u, h, K){
-  g <- learn.gamma(mc.poten, xl, h, ker.T)
-  mc.poten(xl, u, g, h, K)
-}, xl, seq(0.1, 0.2, 0.1), ker.T)
-
 #init
 sel<-iris[,3:5]
 pl<-sel[,1:2]
@@ -28,84 +11,101 @@ ma <- c(7, 2.5)
 acc <- 3
 colors <- c(setosa="red", versicolor="green", virginica="blue")
 par("lwd")
+w<-1000
+h<-500
 
 #1NN lattice with LOO
+png('1nn.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], main="1NN", pch=19)
 k <- 1
 lattice(mc.knn, sel, colors, mi, ma, 0.1, k)
 legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, 1), digits=3)))
+dev.off()
 
 #LOO(k) in KNN
+png('loo_knn.png', width=w, height=h)
 p<-loo.list(mc.knn, sel, 1:50)
 plot(p, type="l", xlab="k", ylab="error", main="LOO KNN")
 legend(0, 0.066, legend=paste("LOO(6) =", round(loo(mc.knn, sel, 6), digits=3)))
-
-el<-learn.loo(mc.pten, sel, 1:20)
-loo(mc.knn, xl, el)
+dev.off()
 
 #6NN lattice with LOO
+png('6nn.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], main="6NN", pch=19)
 k <- 6
 lattice(mc.knn, sel, colors, mi, ma, 0.1, k)
 legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3)))
+dev.off()
 
 #LOO in kwnn
+png('loo_kwnn.png', width=w, height=h)
 p<-loo.list(mc.kwnn, sel, 1:50, mc.wlin)
 plot(p, type="l", xlab="k", ylab="error", main="LOO KWNN")
-legend(0, 0.066, legend=paste("LOO(6) =", round(loo(mc.knn, sel, 6), digits=3)))
+legend(0, 0.066, legend=paste("LOO(6) =", round(loo(mc.kwnn, sel, 6, mc.wlin), digits=3)))
+dev.off()
 
 #6WNN lattice with LOO
+png('6wnn.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], main="6WNN", pch=19)
 k <- 6
 lattice(mc.kwnn, sel, colors, mi, ma, 0.1, k, mc.wlin)
 legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3)))
+dev.off()
 
 #LOO in parzen
+png('parzen.png', width=w, height=h)
+p<-loo.list(mc.kwnn, sel, 1:50, mc.wlin)
+plot(p, type="l", xlab="k", ylab="error", main="LOO KWNN")
+dev.off()
+
+#Lattice parzen
+png('loo_parzen.png', width=1500, height=1500)
+par(mfrow=c(3, 2))
 hs<-seq(from=0.1, to=2, by=0.1)
 p<-loo.list(mc.parzen, sel, hs, ker.T)
-plot(p, type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW", ylim=c(0, 0.2))
-lines(loo.list(mc.parzen, sel, hs, ker.P),  col = "red")
-lines(loo.list(mc.parzen, sel, hs, ker.E),  col = "green")
-lines(loo.list(mc.parzen, sel, hs, ker.G),  col = "blue")
-lines(loo.list(mc.parzen, sel, hs, ker.Q),  col = "grey")
-legend(1.8, 0.2, legend=c("K=T", "K=P", "K=E", "K=G", "K=Q"), lty=5, col=c("black", "red", "green", "blue", "grey") )
+plot(p, type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW K=Triangular", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen, sel, hs, ker.P),
+     type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW K=Pramougolnoe", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen, sel, hs, ker.E),
+     type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW K=Epanechnikova", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen, sel, hs, ker.G),
+     type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW K=Gaussian", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen, sel, hs, ker.Q),
+     type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW K=Quarticheskoe", ylim=c(0, 0.2))
+dev.off()
 
 #LOO in parzen auto
+png('loo_parzen_auto.png', width=1500, height=1500)
+par(mfrow=c(3, 2))
 hs<-1:20
 p<-loo.list(mc.parzen.auto, sel, hs, ker.T)
-plot(p, type="l", xlab="k", ylab="error", main="LOO PARZEN WINDOW", ylim=c(0, 0.2))
-lines(loo.list(mc.parzen.auto, sel, hs, ker.P),  col = "red")
-lines(loo.list(mc.parzen.auto, sel, hs, ker.E),  col = "green")
-lines(loo.list(mc.parzen.auto, sel, hs, ker.G),  col = "blue")
-lines(loo.list(mc.parzen.auto, sel, hs, ker.Q),  col = "grey")
-legend(1.8, 0.2, legend=c("K=T", "K=P", "K=E", "K=G", "K=Q"), lty=5, col=c("black", "red", "green", "blue", "grey") )
+plot(p, type="l", xlab="h", ylab="error", main="LOO PARZEN WINDOW AUTO K=Triangular", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen.auto, sel, hs, ker.P),
+     type="l", xlab="h", ylab="error", main="LOO PARZEN WINDOW AUTO K=Pramougolnoe", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen.auto, sel, hs, ker.E),
+     type="l", xlab="h", ylab="error", main="LOO PARZEN WINDOW AUTO K=Epanechnikova", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen.auto, sel, hs, ker.G),
+     type="l", xlab="h", ylab="error", main="LOO PARZEN WINDOW AUTO K=Gaussian", ylim=c(0, 0.2))
+plot(loo.list(mc.parzen.auto, sel, hs, ker.Q),
+     type="l", xlab="h", ylab="error", main="LOO PARZEN WINDOW AUTO K=Quarticheskoe", ylim=c(0, 0.2))
+dev.off()
+par(mfrow=c(1, 1))
 
-#6WNN lattice with LOO
-plot(pl, col=colors[sel$Species], main="6WNN", pch=19)
-k <- 6
-lattice(mc.kwnn, sel, colors, mi, ma, 0.1, k, mc.wlin)
-legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3)))
+#lattice poten
+png('parzen.png', width=w, height=h)
+plot(pl, col=colors[sel$Species], pch=19, main="Parzen K=Triangular, h=0.4")
+lattice(mc.parzen, sel, colors, mi, ma, 0.1, 0.4, ker.T)
+dev.off()
 
-##
-plot(pl, col=colors[sel$Species], pch=19)
-k <- 6
-w <- apply(data.frame(k, 1:k), 1, mc.w )
-loo(mc.knn, sel, k)
-lattice(mc.poten, sel, colors, c(1,0.1), c(7,2.5), 0.1, 0.2, 0.2, ker.T)
-lattice(mc.kwnn, sel, colors, c(1,0.1), c(7,2.5), 0.1, k, mc.w)
+#lattice poten
+png('poten.png', width=w, height=h)
+plot(pl, col=colors[sel$Species], pch=19, main="Poten K=Triangular, h=0.4")
+lattice(mc.poten, sel, colors, mi, ma, 0.1, learn.gamma(mc.poten, sel, 0.2, ker.T), 0.2, ker.T)
+dev.off()
 
-
-xl<-sel
-cols <- ncol(xl)
-rows <- nrow(xl)
-u<-c(1.4, 0.2)
-umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
-vmat<-xl[,1:(cols-1)]
-distances <- norm(umat - xl[,1:(cols-1)])
-
-  orderedIndexes <- order(distances)
-  xl <- xl[orderedIndexes,]
-  distances <- distances[orderedIndexes]
-
-xl <- xl[,cols]
-wp <- distances[1:k]/distances[k+1]
+#stolp
+png('stolp.png', width=w, height=h)
+plot(pl, col=colors[sel$Species], pch=19, main="STOLP in 2nn, delta = -2, l0 = 3")
+s<- mc.stolp(mc.knn.margin, sel, -2, 3, 2)
+points(s, col=colors[s$Species], cex=2, pch=19)
+dev.off()
