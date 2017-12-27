@@ -98,21 +98,6 @@ plot(pl, col=colors[sel$Species], pch=19, main="Poten K=Triangular, h=0.4")
 lattice(mc.poten, sel, colors, mi, ma, 0.1, learn.gamma(mc.poten, sel, 0.4, ker.T), 0.4, ker.T)
 dev.off()
 
-#gamma poten
-add.alpha <- function(col, alpha=1){
-  if(missing(col))
-    stop("Please provide a vector of colours.")
-  apply(sapply(col, col2rgb)/255, 2, 
-        function(x) 
-          rgb(x[1], x[2], x[3], alpha=alpha))  
-}
-png('poten_gamma.png', width=w, height=h)
-gh<-16
-plot(pl, col=colors[sel$Species], pch=19, main="Poten K=Triangular, h=0.4")
-gamma <- learn.gamma(mc.poten, sel, 0.4, ker.T)
-plot(pl, col=colors[sel$Species], pch=19, cex=gamma*gh+1, )
-dev.off()
-
 #stolp
 png('stolp.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], pch=19, main="STOLP in 2nn, delta = -2, l0 = 3")
