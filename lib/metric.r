@@ -22,7 +22,7 @@ mc.knn <- function(xl, u, k, metric=norm, sorted=FALSE){
     score[class] <- score[class]+1
     i <- i+1
   }
-  
+
   classes[which.max(score)]
 }
 

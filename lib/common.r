@@ -16,6 +16,16 @@ lattice <- function(f, xl, color, mi, ma, acc, ...){
   }
 }
 
+lattice.without <- function(f, color, mi, ma, acc, ...){
+  for(x in seq(mi[1], ma[1], acc)){
+    for(y in seq(mi[2], ma[2], acc)){
+      u <- c(x, y)
+      class <- f(u, ...)
+      points(x, y, col=color[class], pch=21)
+    }
+  }
+}
+
 loo <-function(f, xl, ...){
   cols <- ncol(xl)
   rows <- nrow(xl)

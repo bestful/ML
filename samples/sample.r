@@ -2,6 +2,7 @@ source("../lib/common.r")
 source("../lib/metric.r")
 source("../lib/kernel.r")
 source("../lib/learn.r")
+source("../lib/bayes.r")
 
 #init
 sel<-iris[,3:5]
@@ -97,9 +98,48 @@ plot(pl, col=colors[sel$Species], pch=19, main="Poten K=Triangular, h=0.4")
 lattice(mc.poten, sel, colors, mi, ma, 0.1, learn.gamma(mc.poten, sel, 0.4, ker.T), 0.4, ker.T)
 dev.off()
 
+#gamma poten
+add.alpha <- function(col, alpha=1){
+  if(missing(col))
+    stop("Please provide a vector of colours.")
+  apply(sapply(col, col2rgb)/255, 2, 
+        function(x) 
+          rgb(x[1], x[2], x[3], alpha=alpha))  
+}
+png('poten_gamma.png', width=w, height=h)
+gh<-16
+plot(pl, col=colors[sel$Species], pch=19, main="Poten K=Triangular, h=0.4")
+gamma <- learn.gamma(mc.poten, sel, 0.4, ker.T)
+plot(pl, col=colors[sel$Species], pch=19, cex=gamma*gh+1, )
+dev.off()
+
 #stolp
 png('stolp.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], pch=19, main="STOLP in 2nn, delta = -2, l0 = 3")
 s<- mc.stolp(mc.knn.margin, sel, -2, 3, 2)
 points(s, col=colors[s$Species], cex=2, pch=19)
+dev.off()
+
+png('plugin.png', width=w, height=h)
+plot(pl, col=colors[sel$Species], pch=19, main="Plugin")
+lattice(bc.plugin, sel, colors, mi, ma, 0.1, bc.apr(sel), bc.m(sel), bc.cov(sel))
+
+dev.off()
+
+png('fisher.png', width=w, height=h)
+plot(pl, col=colors[sel$Species], pch=19, main="Fisher")
+lattice(bc.fisher, sel, colors, mi, ma, 0.1, bc.apr(sel), bc.m(sel))
+
+dev.off()
+
+
+png('adaline.png', width=w, height=h)
+lcolors <- c("red", "green")
+names(lcolors)<-c(-1,1)
+lsel<-sel
+lsel[,3] <- as.vector(sel$Species == "setosa")*2-1
+plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Adaline t=0.05, 100 iterations")
+w<-learn.adaline(data.frame(-1, lsel), 0.05,0.5,100)
+
+
 dev.off()

@@ -38,3 +38,23 @@ learn.loo <- function(f, xl, lstOfX, ...){
   i <- which.min(lst[,2])
   lst[i,1]
 }
+
+learn.adaline <- function(xl, temp, lambda, iter){
+  ncols <- ncol(xl)-1
+  nrows <- nrow(xl)
+  classes <- names(table(xl[,ncols+1]))
+  w <- rep(0, ncols)
+  
+  
+  Q <- sqrt(sum((w%*%t(xl[,1:ncols])-t(xl[,ncols+1]))**2))
+  i<-0
+  for(j in 1:iter){
+    print(w)
+    i<-(i+1)%%(nrows+1)
+    x<-xl[i,1:ncols]
+    y<-xl[,ncols+1]
+    w <- w - temp*(t(w)*x - y)*x
+    lines(c(0, -w[1]/w[2]), c(-w[1]/w[3], 0))
+  }
+  w
+}
