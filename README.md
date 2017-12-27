@@ -313,9 +313,29 @@ __Минусы:__
 **3)Разделение смеси** производится _ЕМ-алгоритмом_. Плотности компонент смеси (гауссовские плотности) - радиальные функции,метод радиальных базисных функций.
 
 ## Plugin
-**Нормальный дискриминантный анализ** - один из вариантов байесовской классификации,где восстанавливаемые плотности - многомерные гауссовские: ![](http://latex.codecogs.com/gif.latex?%5Cinline%20N%28x%3B%5Cmu%20%2C%5Csum%29%20%3D%20%5Cfrac%7B1%7D%7B%5Csqrt%7B%282%5Cpi%29%5En%5Cleft%20%7C%20%5Csum%20%5Cright%20%7C%7D%7D%20%5Cexp%20%5Cleft%20%28%20%5Cfrac%7B-1%7D%7B2%7D%20%28x-%5Cmu%29%5ET%20%5Csum%5E%7B-1%7D%28x-%5Cmu%29%5Cright%20%29%2C%20x%20%5Cin%20%5Cmathbb%7BR%7D%5En), где ![](http://latex.codecogs.com/gif.latex?%5Cmu%20%5Cin%20%5Cmathbb%7BR%7D%5En) - мат. ожидание (центр), а ![](http://latex.codecogs.com/gif.latex?%5Csum%20%5Cin%20%5Cmathbb%7BR%7D%5E%7Bn%5Ctimes%20n%20%7D) - ковариационная матрица - симметричная, положительная и невырожденная.  
+__Подстановочный алгоритм__ в качестве моделей восстанавливаемых плотностей
+рассматривает многомерные нормальные плотности, которые вычисляются по формуле:
 
-Находим параметры нормального распределения ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmu_y%20%3D%20%5Cfrac%20%7B1%7D%7Bl_y%7D%20%5Csum_%7Bx_i%3Ay_i%20%3D%20y%7Dx_i)**(1)**, ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Csum_y%20%3D%20%5Cfrac%7B1%7D%7Bl_y-1%7D%20%5Csum_%7Bx_i%3Ay_i%20%3D%20y%7D%28x_i%20-%20%5Cmu_y%29%28x_i-%5Cmu_y%29%5ET)**(2)**  для ![](http://latex.codecogs.com/gif.latex?%5Cinline%20y%20%5Cin%20Y) согласно **принципу максимального правдоподобия**, подставляем в формулу ***ОБРП*** и получаем ***подстановочный алгоритм***, или ***линейный дискриминант Фишера*** (если ковариационные матрицы равны для всех классов).
+![](http://latex.codecogs.com/svg.latex?N%28x%3B%5Cmu%2C%5CSigma%29%20%3D%20%5Cfrac%7B1%7D%7B%5Csqrt%7B%282%5Cpi%29%5En%20%7C%5CSigma%7C%7D%7D%20%5Ccdot%20exp%5Cleft%28-%5Cfrac%7B1%7D%7B2%7D%28x%20-%20%5Cmu%29%5ET%20%5CSigma%5E%7B-1%7D%20%28x%20-%20%5Cmu%29%5Cright%29),
+в которой
+
+![](http://latex.codecogs.com/svg.latex?x%20%5Cin%20%5Cmathbb%7BR%7D%5En)
+– объект, состоящий из *n* признаков,
+
+![](http://latex.codecogs.com/svg.latex?%5Cmu%20%5Cin%20%5Cmathbb%7BR%7D%5En)
+– математическое ожидание,
+
+![](http://latex.codecogs.com/svg.latex?%5CSigma%20%5Cin%20%5Cmathbb%7BR%7D%5E%7Bn%20%5Ctimes%20n%7D)
+– ковариационная матрица.
+
+Чтобы узнать _плотности распределения классов_, алогритм восстанавливает
+неизвестные параметры
+![](http://latex.codecogs.com/svg.latex?%5Cmu%2C%20%5CSigma)
+по следующим формулам для каждого класса _y_ :
+
+![](http://latex.codecogs.com/svg.latex?%5Chat%7B%5Cmu%7D%20%3D%20%5Cfrac%7B1%7D%7Bl_y%7D%20%24%24%5Csum_%7Bi%20%3D%201%7D%5E%7Bl_y%7D%20x_i%24%24)
+
+![](http://latex.codecogs.com/svg.latex?%5Chat%7B%5CSigma%7D%20%3D%20%5Cfrac%7B1%7D%7Bl_y%20-%201%7D%20%24%24%5Csum_%7Bi%20%3D%201%7D%5E%7Bl_y%7D%20%28x_i%20-%20%5Chat%7B%5Cmu%7D%29%28x_i%20-%20%5Chat%7B%5Cmu%7D%29%5ET).
 
 
 
