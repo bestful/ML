@@ -196,7 +196,7 @@ mc.parzen <- function(xl, u, h, K, metric=norm){
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/parzen.png)
 ѕосмотрим на достоинства и недостатки:
 
-###ѕлюсы
+### ѕлюсы
 - хорошее качество классификации при правильно подобраном _h_
 - все точки с одинаковым рассто€нием будут учитаны
 
