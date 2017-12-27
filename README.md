@@ -81,8 +81,60 @@ mc.knn <- function(xl, u, k, metric=norm, sorted=FALSE){
 4. "Скудный" набор параметров.
 5. Точки, расстояние между которыми одинаково, не все будут учитываться.
 
+## Алгоритм k взвешеных ближайших соседей (wknn)
+Имеется некоторая выборка *Xl*, состоящая из объектов *x(i), i = 1, ..., l* (в приложенной программе используется выборка ирисов Фишера).
+Данный алгоритм классификации относит объект *u* к тому классу *y*, у которого максимальна сумма весов *w_i* его ближайших *k* соседей *x(u_i)*.
+
+Для оценки близости классифицируемого объекта *u* к классу *y* **алгоритм wknn** использует следующую функцию:
+
+![](http://latex.codecogs.com/svg.latex?%5Clarge%20W%28i%2C%20u%29%20%3D%20%5Bi%20%5Cleq%20k%5D%20w%28i%29) , где *i* -- порядок соседа по расстоянию к классифицируемому объекту *u*, а *w(i)* -- строго убывающая функция веса, задаёт вклад i-го соседа в классификацию.
+
+В приложенной программе используется весовая функция вида: ![](https://latex.codecogs.com/gif.latex?w%28i%29%20%3D%20q%5Ei%2C%20q%20%5Cepsilon%20%280%2C%201%29)
+
+Реализация весовой функции:
+
+``` R
+mc.wlin <- function(el){
+  k <- el[1]
+  i <- el[2]
+  (k+1-i)/k
+}
+
+```
+
+Реализация классификатора:
+``` R
+mc.kwnn <- function(xl, u, k, wf, metric=norm, sorted=FALSE){
+  cols <- ncol(xl)
+  rows <- nrow(xl)
+  u <- unname(unlist(u))
+  
+  if(sorted != TRUE){
+    umat <- matrix(rep(u, rows), rows, cols-1, byrow=TRUE)
+    w <- apply(data.frame(k, 1:k), 1, wf)
+    w <- matrix(w, length(w), 1)
+    xl <- xl[order(metric(umat - xl[,1:(cols-1)] )),]
+  }
+  xl <- xl[1:k,cols]
+  
+  classes <- names(table(xl))
+  score <- rep(0, length(classes))
+  i <- 1
+  
+  for(el in xl){
+    class <- xl[i]
+    score[class] <- score[class]+w[i]
+    i <- i+1
+  }
+  
+  classes[which.max(score)]
+}
+```
+Давайте найдем оптимальный k в kwnn через LOO
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/loo_kwnn.png)
+Получаем то же оптимальное k. 
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/6wnn.png)
+
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/parzen.png)
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/loo_parzen.png)
 ![mc](https://raw.githubusercontent.com/bestful/ML/master/samples/loo_parzen_auto.png)
