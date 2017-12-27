@@ -50,7 +50,7 @@ learn.adaline <- function(xl, temp, lambda, iter){
   i<-0
   for(j in 1:iter){
     print(w)
-    i<-(i+1)%%(nrows+1)
+    i<-(i)%%(nrows)+1
     x<-xl[i,1:ncols]
     y<-xl[,ncols+1]
     w <- w - temp*(t(w)*x - y)*x

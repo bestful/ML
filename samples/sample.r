@@ -124,7 +124,7 @@ names(lcolors)<-c(-1,1)
 lsel<-sel[sel$Species!="virginica",]
 lsel[,3] <- as.vector(lsel$Species == "setosa")*2-1
 plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Adaline t=0.05, 100 iterations")
-w<-learn.adaline(data.frame(-1, lsel), 0.05,0.5,100)
-
+w<-learn.adaline(data.frame(-1, lsel), 0.05,0.05,100)
+lines(c(0, -w[1]/w[2]), c(-w[1]/w[3], 0), col="blue")
 
 dev.off()
