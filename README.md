@@ -317,64 +317,30 @@ __Минусы:__
 
 Находим параметры нормального распределения ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmu_y%20%3D%20%5Cfrac%20%7B1%7D%7Bl_y%7D%20%5Csum_%7Bx_i%3Ay_i%20%3D%20y%7Dx_i)**(1)**, ![](http://latex.codecogs.com/gif.latex?%5Cinline%20%5Csum_y%20%3D%20%5Cfrac%7B1%7D%7Bl_y-1%7D%20%5Csum_%7Bx_i%3Ay_i%20%3D%20y%7D%28x_i%20-%20%5Cmu_y%29%28x_i-%5Cmu_y%29%5ET)**(2)**  для ![](http://latex.codecogs.com/gif.latex?%5Cinline%20y%20%5Cin%20Y) согласно **принципу максимального правдоподобия**, подставляем в формулу ***ОБРП*** и получаем ***подстановочный алгоритм***, или ***линейный дискриминант Фишера*** (если ковариационные матрицы равны для всех классов).
 
-[src](../PlugIn.R) 
 
-Для сгенерированных с помощью функционала библиотеки **MASS** данных (выборка с двумя классами) вычисляем центры по **(1)**:
 
 ```R
-  cols <- dim(objects)[2]
-  mu <- matrix(NA, 1, cols) #создаём вектор
-  for (col in 1:cols)
-  {
-    mu[1, col] = mean(objects[,col]) #подсчёт среднего значения для каждой из компонент
+bc.plugin <- function(xl, u, apr, m, cv){
+  ncols <- ncol(xl)-1
+  nrows <- nrow(xl)
+  classes <- names(table(xl[,ncols+1]))
+  cl_len <- length(classes)
+  
+  score = rep(0, cl_len)
+  names(score) <- classes
+
+  
+  for (i in classes) {
+    score[i] = apr[i] * N(u, m[i,], cv[[i]])
   }
-```
-Далее, находим ковариационные матрицы классов по **(2)** :
-```R
-  rows <- dim(objects)[1]
-  cols <- dim(objects)[2]
-  sigma <- matrix(0, cols, cols) #нулевая квадратная матрица 
-  for (i in 1:rows)
-  {
-    sigma <- sigma + (t(objects[i,] - mu) %*% # - оператор умножения матриц, t - transpose
-                        (objects[i,] - mu)) / (rows - 1)
-  }
-```
-Из теоремы задания байесовским классификатором квадратичной поверхности получим её уравнение
-![](https://latex.codecogs.com/gif.latex?%5Clambda_s%20P_sp_s%28x%29%20%3D%20%5Clambda_t%20P_tp_t%28x%29%2C)  
-Логарифмируя, ![](https://latex.codecogs.com/gif.latex?%5Cln%20p_s%28x%29%20-%20%5Cln%20p_t%28x%29%20%3D%20C_%7Bst%7D),![](https://latex.codecogs.com/gif.latex?C_%7Bst%7D%20%3D%20%5Cln%28%5Clambda_tP_t/%5Clambda_sP_s%29) - константа, не зависит от x.
-Осталось вычислить коэффициенты квадратичного дискриминанта из двух квадратичных форм ln p(x) : ![](https://latex.codecogs.com/gif.latex?%5Cln%20p_y%28x%29%20%3D%20-%5Cfrac%7Bn%7D%7B2%7D%5Cln2%5Cpi%20-%20%5Cfrac%7B1%7D%7B2%7D%20%5Cln%20%7C%5Csum_y%7C-%5Cfrac%7B1%7D%7B2%7D%28x%20-%20%5Cmu_y%29%5ET%5Csum%5E%7B-1%7D_y%28x-%5Cmu_y%29)
-```R
-# кривая второго порядка: a*x1^2 + b*x1*x2 + c*x2 + d*x1 + e*x2 + f = 0
-  invSigma1 <- solve(sigma1)#обратные матрицы
-  invSigma2 <- solve(sigma2)
-  f <- log(abs(det(sigma1))) - log(abs(det(sigma2))) +
-    mu1 %*% invSigma1 %*% t(mu1) - mu2 %*% invSigma2 %*%
-    t(mu2);
-  alpha <- invSigma1 - invSigma2
-  a <- alpha[1, 1] #коэффициент - элемент матрицы
-  b <- 2 * alpha[1, 2]#полученный вычитанием обратных матриц
-  c <- alpha[2, 2]
-  beta <- invSigma1 %*% t(mu1) - invSigma2 %*% t(mu2)
-  d <- -2 * beta[1, 1]#всё выводится из квадратичной формы
-  e <- -2 * beta[2, 1]
-  ##решаем проблему возвращения из функции набора параметров передачей их map-ом
-  return (c("x^2" = a, "xy" = b, "y^2" = c, "x" = d, "y" = e, "1" = f))
+  classes[which.max(score)]
+}
 ```
 **Результаты**
 
-<figure>
- <img src="pics/plug1.png" width="500">
- <img src="pics/plug2.png" width="500">
- <img src="pics/NDAEllips.png" width="500">
- <img src="pics/NDA2Lines.png" width="500">
-  <figcaption>Признаки некореллированы - линии уровня плотности эллипсоидные, 
-    с центром mu, оси параллельны ox/oy.</figcaption>
-</figure>
+![bc](https://raw.githubusercontent.com/bestful/ML/master/samples/plugin.png)
 
-Классы не равновероятны или не равнозначны - разделяющая гиперплоскость отодвигается дальше от более значимого класса.  
 
-Ковариационные матрицы не диагональны и не равны - разделяющая поверхность квадратична и прогибается - менее плотный класс охватывает более плотный.
 
 ***Недостатки***
 
@@ -383,7 +349,7 @@ __Минусы:__
  - Если длина выборки меньше размерности пространства, **?y < n**, или среди признаков есть линейно зависимые, то ковар. матрица становится вырожденной. В этом случае обратная матрица не существует и метод вообще неприменим.
  - Выборочные оценки чувствительны к нарушениям нормальности распределений, в частности, к редким большим выбросам.
 
-![bc](https://raw.githubusercontent.com/bestful/ML/master/samples/plugin.png)
+
 
 ## LDF 
 
@@ -391,23 +357,20 @@ __Минусы:__
 
 Это означает, что классы имеют одинаковую сферическую форму, разделяющая плоскость проходит посередине между классами, ортогонально линии, соединяющей центры классов. Нормаль оптимальна - прямая, в одномерной проекции на которую классы разделяются наилучшим образом,с наименьшим байесовским риском **R(a)**.
 
-<img src="pics/FLDe.png" height = "200" width="500">
-
 Применяя ![](https://latex.codecogs.com/gif.latex?%5Cln%20p_y%28x%29%20%3D%20-%5Cfrac%7Bn%7D%7B2%7D%5Cln2%5Cpi%20-%20%5Cfrac%7B1%7D%7B2%7D%20%5Cln%20%7C%5Csum_y%7C-%5Cfrac%7B1%7D%7B2%7D%28x%20-%20%5Cmu_y%29%5ET%5Csum%5E%7B-1%7D_y%28x-%5Cmu_y%29) , квадратичные члены сокращаются и уравнение поверхности
 вырождается в линейную форму: ![](https://latex.codecogs.com/gif.latex?%28x-%5Cmu_%7Bst%7D%29%5ET%5Csum%5E%7B-1%7D%28%5Cmu_s-%5Cmu_t%29%20%3D%20C_%7Bst%7D), где ![](https://latex.codecogs.com/gif.latex?%5Cmu_%7Bst%7D%20%3D%20%5Cfrac%7B1%7D%7B2%7D%28%5Cmu_s&plus;%5Cmu_t%29) - точка посередине между центрами классов.
 
 
-[src](../FLD.R)
 
 Код существенно не отличается от предыдущего алгоритма.
 
 **Результаты**
 
-<img src="pics/FLD1.png" width="500">
+![bc](https://raw.githubusercontent.com/bestful/ML/master/samples/fisher.png)
 
 Алгоритм неплохо работает, когда формы классов действительно близки к нормальным и не слишком сильно различаются.  
 
 В этом случае линейное решающее правило близко к оптимальному байесовскому, но устойчивее квадратичного, и часто обладает лучшей обобщающей способностью.
-![bc](https://raw.githubusercontent.com/bestful/ML/master/samples/fisher.png)
+
 
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/adaline.png)
