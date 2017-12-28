@@ -54,7 +54,7 @@ legend(mi[1], ma[2], legend=paste("LOO =", round(loo(mc.knn, sel, k), digits=3))
 dev.off()
 
 #Lattice parzen
-png('loo_parzen.png', width=1500, height=1500)
+png('loo_parzen.png', width=800, height=800)
 par(mfrow=c(3, 2))
 hs<-seq(from=0.1, to=2, by=0.1)
 p<-loo.list(mc.parzen, sel, hs, ker.T)
@@ -70,7 +70,7 @@ plot(loo.list(mc.parzen, sel, hs, ker.Q),
 dev.off()
 
 #LOO in parzen auto
-png('loo_parzen_auto.png', width=1500, height=1500)
+png('loo_parzen_auto.png', width=800, height=800)
 par(mfrow=c(3, 2))
 hs<-1:20
 p<-loo.list(mc.parzen.auto, sel, hs, ker.T)
@@ -108,12 +108,14 @@ dev.off()
 png('plugin.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], pch=19, main="Plugin")
 lattice(bc.plugin, sel, colors, mi, ma, 0.1, bc.apr(sel), bc.m(sel), bc.cov(sel))
+legend(mi[1], ma[2], legend=paste("LOO =", round(loo(bc.plugin, sel, bc.apr(sel), bc.m(sel), bc.cov(sel)), digits=3)))
 
 dev.off()
 
 png('fisher.png', width=w, height=h)
 plot(pl, col=colors[sel$Species], pch=19, main="Fisher")
 lattice(bc.fisher, sel, colors, mi, ma, 0.1, bc.apr(sel), bc.m(sel))
+legend(mi[1], ma[2], legend=paste("LOO =", round(loo(bc.fisher, sel, bc.apr(sel), bc.m(sel)), digits=3)))
 
 dev.off()
 
