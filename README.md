@@ -436,7 +436,7 @@ bc.fisher <- function(xl, u, apr, m){
 ![](http://www.machinelearning.ru/mimetex/?Q(w)%20\,%20=%20\,%20\sum_{i=1}^m%20(a(x_i,%20w)%20-%20%20%20%20y_i)^2%20\to%20\min_w)
 Применим метод градиентного спуска.
 
-<img src='https://raw.githubusercontent.com/bestful/ML/master/readme/adaline-learn.png'>
+![](https://raw.githubusercontent.com/bestful/ML/master/readme/adaline-learn.png)
 
 Реализация обучения (по количеству итераций)
 ``` R
