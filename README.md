@@ -435,7 +435,7 @@ bc.fisher <- function(xl, u, apr, m){
 Обучение ADALINE заключается в подборе "наилучших" значений вектора весов w. Какие значение весов лучше определяет функционал потерь.В ADALINE используется функционал, предложенный Видроу и Хоффом, L(a,x) = (a - y)^2. Таким образом необходимо минимизировать функционал Q(w):
 ![](http://www.machinelearning.ru/mimetex/?Q(w)%20\,%20=%20\,%20\sum_{i=1}^m%20(a(x_i,%20w)%20-%20%20%20%20y_i)^2%20\to%20\min_w)
 Применим метод градиентного спуска.
-<img align="left" src="https://raw.githubusercontent.com/bestful/ML/master/readme/adaline-learn.png">
+<img align="left" src="https://raw.githubusercontent.com/bestful/ML/master/readme/adaline-learn.png"></img>
 Реализация обучения (по количеству итераций)
 ``` R
   ncols <- ncol(xl)-1
