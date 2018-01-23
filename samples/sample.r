@@ -3,6 +3,7 @@ source("../lib/metric.r")
 source("../lib/kernel.r")
 source("../lib/learn.r")
 source("../lib/bayes.r")
+source("../lib/linear.r")
 
 #init
 sel<-iris[,3:5]
