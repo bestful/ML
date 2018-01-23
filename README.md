@@ -590,7 +590,7 @@ learn.lin.logistic <- function(xl, ...){
 ![](https://latex.codecogs.com/gif.latex?%5Cmin_%7Bi%3D1%2C%20%5Cdots%2C%20l%7D%20y_i%20%28%5Clangle%20w%2C%20x_i%20%5Crangle%20-%20w_0%29%20%3D%201)
 
 Множество точек ![](https://latex.codecogs.com/gif.latex?%5C%7B%20x%3A%20-1%20%5Cleq%20%5Clangle%20w%2C%20x%20%5Crangle%20-w_0%20%5Cleq%201%20%5C%7D) описывает полосу, разделяющую классы.
-![](https://i2.wp.com/lasseschultebraucks.com/wp-content/uploads/2017/09/SVM_margins.png?resize=734%2C734&ssl=1)
+![](https://raw.githubusercontent.com/bestful/ML/master/readme/SVM_margins.png)
 
 Разделяющая гиперплоскость проходит ровно по середине между ними. Объекты, ближайшие к разделяющей гиперплоскости, лежат на границах полосы, и именно на них достигается минимум. В каждом из классов имеется хотя бы один такой объект.
 Итак, в случае линейно разделимой выборки получаем задачу квадратичного программирования:
@@ -604,3 +604,22 @@ learn.lin.logistic <- function(xl, ...){
 ![](https://latex.codecogs.com/gif.latex?%5Cbegin%7Bcases%7D%201/2%20%5Clangle%20w%2C%20w%20%5Crangle%20&plus;%20C%20%5Csum_%7Bi%3D1%7D%5El%20%5Cepsilon_i%20%5Crightarrow%20%5Cmin_%7Bw%2C%20w_0%2C%20%5Cepsilon%7D%20%5C%5C%20y_i%20%28%5Clangle%20w%2C%20x_i%5Crangle%20-%20w_0%29%20%5Cgeq%201%20-%20%5Cepsilon_i%20%5Cend%7Bcases%7D)
 
 Положительная константа C является управляющим параметром метода и позволяет находить компромисс между максимизацией ширины разделяющей полосы и минимизацией суммарной ошибки.
+
+___Рассмотрим SVM на примере___
+``` R
+require("e1071")
+require("kernlab")
+
+ssel <- sel[ Species!="virginica" ,]
+ssel$Species <- factor(ssel$Species)
+smodel <- ksvm(Species ~ Petal.Length + Petal.Width, data = ssel, kernel="linea")
+plot(smodel, ssel, Petal.Width ~ Petal.Length)
+
+ssel <- sel[ Species!="setosa" ,]
+ssel$Species <- factor(ssel$Species)
+smodel <- svm(Species ~ Petal.Length + Petal.Width, data = ssel, kernel="linea")
+plot(smodel, ssel, Petal.Width ~ Petal.Length, bgcol="red")
+```
+
+![](https://raw.githubusercontent.com/bestful/ML/master/samples/svm_1.png)
+![](https://raw.githubusercontent.com/bestful/ML/master/samples/svm_2.png)
