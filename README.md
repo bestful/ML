@@ -439,7 +439,19 @@ bc.fisher <- function(xl, u, apr, m){
 и _дельта-правило_ правило обновления весов
 ![](http://latex.codecogs.com/svg.latex?w%3Dw-%5Ceta%28%5Clangle%20w%2Cx_i%20%5Crangle-y_i%29x_i).
 
-Пример на ирисах Фишера с 2 классами (удален virginica). В качестве случайного элемента был выбран следующий элемент из выборки. 
+Реализация обучения:
+``` R
+learn.lin.adaline <- function(xl, ...){
+  lin.SG(xl, 
+         function(M){ 
+           (M-1)**2 
+         }, 
+         function(w, temp, xi, yi){
+           w - temp*(sum(w*xi)-yi)*xi
+         }, ...)
+}
+```
+Пример на ирисах Фишера с 2 классами (удален virginica). 
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/adaline.png)
 Синей линией обозначена разделяющая поверхность на последней итерации
 
@@ -450,6 +462,24 @@ bc.fisher <- function(xl, u, apr, m){
 и _правило Хебба_ для обновления весов
 ![](http://latex.codecogs.com/svg.latex?%5Ctext%7Bif%20%7D%5Clangle%20w%2Cx_i%20%5Crangle%20y_i%3C0%20%5Ctext%7B%20then%20%7D%20w%3A%3Dw&plus;%5Ceta%20x_iy_i).
 
+Реализация обучения:
+``` R
+learn.lin.perceptron <- function(xl, ...){
+  lin.SG(xl, 
+         function(M){ 
+           if(M<0)
+             -M
+           else
+             0
+         }, 
+         function(w, temp, xi, yi){
+           if(sum(w*xi)*yi < 0)
+             w + temp*xi*yi
+           else
+             w
+         }, ...)
+}
+```
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/perceptron.png)
 ### Логистическая регрессия
 
@@ -461,7 +491,18 @@ bc.fisher <- function(xl, u, apr, m){
 
 и _логистическое_ правило обновления весов
 ![](http://latex.codecogs.com/svg.latex?w%20%3A%3D%20w&plus;%5Ceta%20y_ix_i%5Csigma%28-%5Clangle%20w%2Cx_i%20%5Crangle%20y_i%29) , где
-
 ![](http://latex.codecogs.com/svg.latex?%5Csigma%28z%29%3D%5Cfrac%7B1%7D%7B1&plus;e%5E%7B-z%7D%7D) – _сигмоидная функция_.
+Реализация обучения:
+``` R
+learn.lin.logistic <- function(xl, ...){
+  lin.SG(xl, 
+              function(M){ 
+                log2(1+exp(-M))
+              }, 
+              function(w, temp, xi, yi){
+                w + temp*yi*xi*(1/(1+exp(sum(w*xi)*yi)))
+              }, ...)
+}
+```
 
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/logistic.png)
