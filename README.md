@@ -422,37 +422,40 @@ bc.fisher <- function(xl, u, apr, m){
 Рассмотрим случай 2 классов.
 Пусть ![](http://www.machinelearning.ru/mimetex/?Y=\\{-1,+1\\})
 Линейным классификатором называется алгоритм классификации ![](http://www.machinelearning.ru/mimetex/?a:%20X\to%20Y) вида
-**sign( <w, x>)**
+![](https://latex.codecogs.com/svg.latex?sign%28%3Cw%2C%20x%3E%29)
 где ![](http://www.machinelearning.ru/mimetex/?w_j) — вес j-го признака, ![](http://www.machinelearning.ru/mimetex/?w_0) — порог принятия решения, w — вектор весов. Предполагается, что искусственно введён «константный» нулевой признак: ![](http://www.machinelearning.ru/mimetex/?f_{0}(x)=-1). 
+
+Величина ![](http://latex.codecogs.com/svg.latex?M_i%28w%29%3Dy_i%5Clangle%20x_i%2Cw%20%5Crangle)называется __отступом__ объекта относительно алгоритма классификации. Если ![](http://latex.codecogs.com/svg.latex?M_i%28w%29%3C0),алгоритм совершает на объекте ![](http://latex.codecogs.com/svg.latex?x_i) ошибку.
+
+![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%28M%29)– монотонно невозрастающая __функция потерь__, мажорирует пороговую функцию
+![](http://latex.codecogs.com/svg.latex?%5BM%3C0%5D%20%5Cleq%20%5Cmathcal%7BL%7D%28M%29).
+Тогда __минимизацю суммарных потерь__ можно рассматривать как функцию вида
+![](https://latex.codecogs.com/svg.latex?%5Ctilde%7BQ%7D%28w%2CX%5E%5Cell%29%20%3D%20%5Csum_%7Bi%3D1%7D%5E%7B%5Cell%7DL%5Cmathcal%28M_i%28w%29%29%5Crightarrow%20%5Cmin_w)
+
 ## Адаптивный линейный элемент
-Пусть дана обучающая выборка: множество входных значений X и множество выходящих значений Y, такие что каждому входу xj соответствует yj - выход, j = 1..m. Необходимо по этим данным построить ADALINE, которая допускает наименьшее количество ошибок на этой обучающей выборке. 
-
-Обучение ADALINE заключается в подборе "наилучших" значений вектора весов w. Какие значение весов лучше определяет функционал потерь.В ADALINE используется функционал, предложенный Видроу и Хоффом, L(a,x) = (a - y)^2. Таким образом необходимо минимизировать функционал Q(w):
-
-![](http://www.machinelearning.ru/mimetex/?Q(w)%20\,%20=%20\,%20\sum_{i=1}^m%20(a(x_i,%20w)%20-%20%20%20%20y_i)^2%20\to%20\min_w)
-
-Применим метод градиентного спуска.
-
-![](https://raw.githubusercontent.com/bestful/ML/master/readme/adaline-learn.png)
-
-Реализация обучения (по количеству итераций)
-``` R
-  ncols <- ncol(xl)-1
-  nrows <- nrow(xl)
-  classes <- names(table(xl[,ncols+1]))
-  w <- rep(0, ncols)
-  
-  
-  Q <- sqrt(sum((w%*%t(xl[,1:ncols])-t(xl[,ncols+1]))**2))
-  i<-0
-  for(j in 1:iter){
-    i<-(i)%%(nrows)+1
-    x<-xl[i,1:ncols]
-    y<-xl[,ncols+1]
-    w <- w - temp*(t(w)*x - y)*x
-    lines(c(0, -w[1]/w[2]), c(-w[1]/w[3], 0))
-  }
-```
+Имеет _квадратичную функцию потерь_
+![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%28M%29%3D%28M-1%29%5E2%3D%28%5Clangle%20w%2Cx_i%20%5Crangle%20y_i-1%29%5E2)
+и _дельта-правило_ правило обновления весов
+![](http://latex.codecogs.com/svg.latex?w%3Dw-%5Ceta%28%5Clangle%20w%2Cx_i%20%5Crangle-y_i%29x_i).
 Пример на ирисах Фишера с 2 классами (удален virginica). В качестве случайного элемента был выбран следующий элемент из выборки.
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/adaline.png)
+
+## Персептро Розенблатта
+Имеет _кусочно-линейную функцию потерь_
+![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%3D%28-M%29_&plus;%3D%5Cmax%28-M%2C0%29)
+и _правило Хебба_ для обновления весов
+![](http://latex.codecogs.com/svg.latex?%5Ctext%7Bif%20%7D%5Clangle%20w%2Cx_i%20%5Crangle%20y_i%3C0%20%5Ctext%7B%20then%20%7D%20w%3A%3Dw&plus;%5Ceta%20x_iy_i).
+![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/perceptron.png)
+### Логистическая регрессия
+
+Также является __оптимальный байесовским классификатором__ из-за своих довольно
+сильных вероятностных предположений.
+
+Имеет _логистическую функцию потерь_
+![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%28M%29%20%3D%20%5Clog_2%281%20&plus;%20e%5E%7B-M%7D%29)
+и _логистическое_ правило обновления весов
+![](http://latex.codecogs.com/svg.latex?w%20%3A%3D%20w&plus;%5Ceta%20y_ix_i%5Csigma%28-%5Clangle%20w%2Cx_i%20%5Crangle%20y_i%29) , где
+![](http://latex.codecogs.com/svg.latex?%5Csigma%28z%29%3D%5Cfrac%7B1%7D%7B1&plus;e%5E%7B-z%7D%7D) – _сигмоидная функция_.
+
+![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/logistic.png)
 Синей линией обозначена разделяющая поверхность на последней итерации
