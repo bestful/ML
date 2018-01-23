@@ -432,6 +432,20 @@ bc.fisher <- function(xl, u, apr, m){
 Тогда __минимизацю суммарных потерь__ можно рассматривать как функцию вида
 ![](https://latex.codecogs.com/svg.latex?%5Ctilde%7BQ%7D%28w%2CX%5E%5Cell%29%20%3D%20%5Csum_%7Bi%3D1%7D%5E%7B%5Cell%7DL%5Cmathcal%28M_i%28w%29%29%5Crightarrow%20%5Cmin_w)
 
+### Метод стохастического градиента
+Пусть задана обучающая выборка ![](https://latex.codecogs.com/gif.latex?X%5El%20%3D%20%5C%7B%28x_i%2C%20y_i%29%5C%7D_%7Bi%3D1%7D%5El%20%2C%20x_i%20%5Cin%20%5Cmathbb%7BR%7D%5En%20%2C%20y_i%20%5Cin%20%5C%7B-1%2C%20&plus;1%20%5C%7D)
+Требуется найти вектор параметров ![](https://latex.codecogs.com/gif.latex?w%20%5Cin%20%5Cmathbb%7BR%7D) , при котором достигается минимум аппроксимированного эмпирического риска:
+
+![](https://latex.codecogs.com/gif.latex?Q%28w%2C%20X%5El%29%20%3D%20%5Csum_%7Bi%3D1%7D%5El%20L%28%5Clangle%20w%2C%20x_i%20%5Crangle%20y_i%29%20%5Crightarrow%20%5Cmin_w)
+
+Применим для минимизации Q(w) метод градиентного спуска. В этом методе выбирается некоторое начальное приближение для w, затем запускается итерационный процесс, на каждом шаге которого вектор w изменяется в направлении наиболее быстрого убывания функционала Q. Это направление противоположно направлению вектора градиента ![](https://latex.codecogs.com/gif.latex?Q%27%28w%29%20%3D%20%5Cleft%28%5Cdfrac%7B%5Cpartial%20Q%28w%29%7D%7B%5Cpartial%20w_j%7D%5Cright%29_%7Bj%3D1%7D%5En) :
+![](https://latex.codecogs.com/gif.latex?w%20%3D%20w%20-%20%5Ceta%20Q%27%28w%29)
+где ![](https://latex.codecogs.com/gif.latex?%5Ceta%20%3E%200) - темп обучения
+Предположим, что функция L дифференцируема. Выпишем градиент:
+![](https://latex.codecogs.com/gif.latex?w%20%3D%20w%20-%20%5Ceta%20%5Csum_%7Bi%3D1%7D%5En%20L%27%28%5Clangle%20w%2C%20x_i%20%5Crangle%20y_i%29%20x_i%20y_i)
+Каждый прецедент ![](https://latex.codecogs.com/gif.latex?%28x_i%2C%20y_i%29) вносит аддитивный вклад в изменение вектора w, но вектор w изменяется только после перебора всех l объектов. Сходимость итерационного процесса можно улучшить, если выбирать прецеденты ![](https://latex.codecogs.com/gif.latex?%28x_i%2C%20y_i%29) по одному, для каждого делать градиентный шаг и сразу обновлять вектор весов:
+![](https://latex.codecogs.com/gif.latex?w%20%3D%20w%20-%20%5Ceta%20L%27_a%20%28%5Clangle%20w%2C%20x_i%20%5Crangle%20y_i%29x_i%20y_i)
+В методе __стохастического градиента (stochastic gradient, SG)__ прецеденты перебираются в случайном порядке. Если же объекты предъявлять в некотором фиксированном порядке, процесс может зациклиться или разойтись.Инициализация весов может производиться различными способами. Стандартная рекомендация - взять небольшие случайные значения ![](https://latex.codecogs.com/gif.latex?w_j%20%3D%20random%5Cleft%28%5Cfrac%7B-1%7D%7B2n%7D%3B%20%5Cfrac%7B1%7D%7B2n%7D%5Cright%29)
 ## Адаптивный линейный элемент
 Имеет _квадратичную функцию потерь_
 ![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%28M%29%3D%28M-1%29%5E2%3D%28%5Clangle%20w%2Cx_i%20%5Crangle%20y_i-1%29%5E2)
@@ -455,7 +469,7 @@ learn.lin.adaline <- function(xl, ...){
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/adaline.png)
 Синей линией обозначена разделяющая поверхность на последней итерации
 
-## Персептро Розенблатта
+## Персептрон Розенблатта
 Имеет _кусочно-линейную функцию потерь_
 ![](http://latex.codecogs.com/svg.latex?%5Cmathcal%7BL%7D%3D%28-M%29_&plus;%3D%5Cmax%28-M%2C0%29)
 
@@ -506,3 +520,6 @@ learn.lin.logistic <- function(xl, ...){
 ```
 
 ![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/logistic.png)
+### Адалайн, перцептрон Розенблатта и логистическая регрессия
+![lic](https://raw.githubusercontent.com/bestful/ML/master/samples/lin_all.png)
+## SVM 
