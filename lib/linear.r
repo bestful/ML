@@ -61,6 +61,8 @@ learn.lin.perceptron <- function(xl, ...){
          function(w, temp, xi, yi){
            if(sum(w*xi)*yi < 0)
              w + temp*xi*yi
+           else
+             w
          }, ...)
 }
 
@@ -70,7 +72,7 @@ learn.lin.logistic <- function(xl, ...){
                 log2(1+exp(-M))
               }, 
               function(w, temp, xi, yi){
-                w + temp*yi*xi*(1/(1+exp(sum(w, xi)*yi)))
+                w + temp*yi*xi*(1/(1+exp(sum(w*xi)*yi)))
               }, ...)
 }
 
@@ -93,7 +95,7 @@ lin.perceptron <- function(xl, ...){
 }
 
 
-lin.logistic <- function(xl, lam=0.01, maxIter=1000){
+lin.logistic <- function(xl, ...){
   w <- learn.lin.logistic(data.frame(-1, xl), ...)
   gen <- lin.clsfy
   formals(gen) <- formals(gen)[-3]

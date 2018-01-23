@@ -14,7 +14,7 @@ acc <- 3
 colors <- c(setosa="red", versicolor="green", virginica="blue")
 par("lwd")
 w<-1000
-h<-500
+h<-499
 
 #1NN lattice with LOO
 png('1nn.png', width=w, height=h)
@@ -120,14 +120,69 @@ legend(mi[1], ma[2], legend=paste("LOO =", round(loo(bc.fisher, sel, bc.apr(sel)
 
 dev.off()
 
+# Linear stuff
+lam <- 0.1
+maxIter <- 200
+cb <- function(w, ...){
+  lines(c(0, w[1]/w[2]), c(w[1]/w[3], 0))
+}
+ecb <- function(w, color="blue", ...){
+  lines(c(0, w[1]/w[2]), c(w[1]/w[3], 0), col=color)
+}
 
-png('adaline.png', width=w, height=h)
 lcolors <- c("red", "green")
-names(lcolors)<-c(-1,1)
 lsel<-sel[sel$Species!="virginica",]
 lsel[,3] <- as.vector(lsel$Species == "setosa")*2-1
-plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Adaline t=0.05, 100 iterations")
-w<-learn.adaline(data.frame(-1, lsel), 0.05,0.05,100)
-lines(c(0, -w[1]/w[2]), c(-w[1]/w[3], 0), col="blue")
+# lsel <- unique(lsel)
+# lc <- lsel[,3]
+# lc <- replace(lc, lc==1, "red")
+# lc <- replace(lc, lc==-1, "green")
 
+# adaline
+png('adaline.png', width=w, height=h)
+{
+plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Adaline lambda=0.1")
+f<-lin.adaline(lsel, lam, maxIter, cb)
+w <- environment(f)$w
+ecb(w)
+}
 dev.off()
+
+# perceptron
+png('perceptron.png', width=w, height=h)
+{
+plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Perceptron lambda=0.1")
+f<-lin.perceptron(lsel, lam, maxIter, cb)
+w <- environment(f)$w
+ecb(w)
+}
+dev.off()
+
+# logistic
+png('logisitic.png', width=w, height=h)
+{
+plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Logistic regression lambda=0.1")
+f<-lin.logistic(lsel, lam, maxIter, cb)
+w <- environment(f)$w
+ecb(w)
+}
+dev.off()
+
+# all
+png('lin_all.png', width=w, height=h)
+{
+plot(lsel[,1:2], col=lcolors[sel$Species], pch=19, main="Adaline, Perceptron, Logistic regression")
+fa<-lin.adaline(lsel, lam, maxIter)
+wa <- environment(fa)$w
+fp<-lin.perceptron(lsel, lam, maxIter)
+wp <- environment(fp)$w
+fl<-lin.logistic(lsel, lam, maxIter)
+wl <- environment(fl)$w
+ecb(wa, "blue")
+ecb(wp, "yellow")
+ecb(wl, "grey")
+legend(1, 1.8, legend=c("Adaline", "Perceptron", "Logistic regression"),
+       col=c("blue", "yellow", "grey"), lty=1, cex=0.8)
+}
+dev.off()
+
